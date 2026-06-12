@@ -1,0 +1,26 @@
+{
+  "name": "notas-personales",
+  "version": "1.0.0",
+  "description": "Aplicación de notas personales con vulnerabilidades intencionales de seguridad",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix ."
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sql.js": "^1.10.3",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "cookie-parser": "^1.4.6"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-plugin-security": "^1.7.1"
+  },
+  "keywords": ["notes", "express", "sqlite", "security"],
+  "author": "",
+  "license": "ISC"
+}
