@@ -26,6 +26,7 @@
           <h3>Categorías</h3>
           <ul id="categoryList">
             <li><button class="category-btn active" data-category="all">Todas</button></li>
+            <li><button class="category-btn" data-category="general">General</button></li>
             <li><button class="category-btn" data-category="trabajo">Trabajo</button></li>
             <li><button class="category-btn" data-category="personal">Personal</button></li>
             <li><button class="category-btn" data-category="ideas">Ideas</button></li>
@@ -80,7 +81,18 @@
     </div>
   </div>
 
-  <div id="message" class="message hidden"></div>
+  <div id="confirmModal" class="confirm-modal hidden">
+    <div class="confirm-box">
+      <h2>Confirmar</h2>
+      <p id="confirmMessage">¿Estás seguro?</p>
+      <div class="confirm-actions">
+        <button id="confirmCancelBtn" class="btn btn-secondary">Cancelar</button>
+        <button id="confirmDeleteBtn" class="btn btn-danger">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="toast-container"></div>
 
   <script src="/js/app.js"></script>
 </body>
