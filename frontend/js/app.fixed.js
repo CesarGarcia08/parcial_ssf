@@ -13,16 +13,63 @@ function sanitizeObject(obj) {
 }
 
 function showMessage(message, type = 'success') {
-  const msgEl = document.getElementById('message');
-  if (!msgEl) return;
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
 
-  msgEl.textContent = message;
-  msgEl.className = `message ${type}`;
-  msgEl.classList.remove('hidden');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.textContent = message;
+  container.appendChild(toast);
 
   setTimeout(() => {
-    msgEl.classList.add('hidden');
+    toast.style.animation = 'toastOut 0.3s ease-in forwards';
+    setTimeout(() => toast.remove(), 300);
   }, 3000);
+}
+
+function showConfirmModal(message) {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('confirmModal');
+    const msgEl = document.getElementById('confirmMessage');
+    const cancelBtn = document.getElementById('confirmCancelBtn');
+    const deleteBtn = document.getElementById('confirmDeleteBtn');
+
+    if (!modal || !msgEl || !cancelBtn || !deleteBtn) {
+      resolve(false);
+      return;
+    }
+
+    msgEl.textContent = message;
+    modal.classList.remove('hidden');
+
+    function cleanup() {
+      modal.classList.add('hidden');
+      cancelBtn.removeEventListener('click', onCancel);
+      deleteBtn.removeEventListener('click', onConfirm);
+      modal.removeEventListener('click', onOverlay);
+    }
+
+    function onCancel() {
+      cleanup();
+      resolve(false);
+    }
+
+    function onConfirm() {
+      cleanup();
+      resolve(true);
+    }
+
+    function onOverlay(e) {
+      if (e.target === modal) {
+        cleanup();
+        resolve(false);
+      }
+    }
+
+    cancelBtn.addEventListener('click', onCancel);
+    deleteBtn.addEventListener('click', onConfirm);
+    modal.addEventListener('click', onOverlay);
+  });
 }
 
 async function checkAuth() {
@@ -110,7 +157,7 @@ if (registerForm) {
       const data = await res.json();
 
       if (data.success) {
-        showMessage('Registro exitoso. Ahora puedes iniciar sesión.', 'success');
+        showMessage('Registro exitoso', 'success');
         setTimeout(() => {
           window.location.href = '/';
         }, 1500);
@@ -173,8 +220,9 @@ function initDashboard() {
     const notesList = document.getElementById('notesList');
     const notesTitle = document.getElementById('notesTitle');
 
-    const categoryNames = {
+    const displayNames = {
       all: 'Todas',
+      general: 'General',
       trabajo: 'Trabajo',
       personal: 'Personal',
       ideas: 'Ideas'
@@ -182,7 +230,7 @@ function initDashboard() {
 
     notesTitle.textContent = currentSearch
       ? `Resultados para "${currentSearch}"`
-      : `${categoryNames[currentCategory] || 'Todas'} las notas`;
+      : `${displayNames[currentCategory] || 'Todas'} las notas`;
 
     notesList.innerHTML = '';
 
@@ -218,7 +266,7 @@ function initDashboard() {
 
       const cat = document.createElement('span');
       cat.className = 'note-category';
-      cat.textContent = note.category;
+      cat.textContent = displayNames[note.category] || note.category;
 
       const dateSpan = document.createElement('span');
       dateSpan.textContent = date;
@@ -273,7 +321,8 @@ function initDashboard() {
   };
 
   window.deleteNote = async function(id) {
-    if (!confirm('¿Estás seguro de eliminar esta nota?')) return;
+    const confirmed = await showConfirmModal('¿Estás seguro de eliminar esta nota?');
+    if (!confirmed) return;
 
     try {
       const res = await fetch(`${API_BASE}/notes/${id}`, {
@@ -282,7 +331,7 @@ function initDashboard() {
       });
 
       if (res.ok) {
-        showMessage('Nota eliminada', 'success');
+        showMessage('Nota eliminada correctamente', 'success');
         loadNotes();
       } else {
         showMessage('Error al eliminar la nota', 'error');
@@ -350,7 +399,7 @@ function initDashboard() {
 
       if (res.ok) {
         modal.classList.add('hidden');
-        showMessage(id ? 'Nota actualizada' : 'Nota creada', 'success');
+        showMessage(id ? 'Nota actualizada correctamente' : 'Nota creada correctamente', 'success');
         loadNotes();
       } else {
         showMessage('Error al guardar la nota', 'error');
